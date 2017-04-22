@@ -21,7 +21,8 @@ class BlogHandler(webapp2.RequestHandler):
         """
 
         # TODO - filter the query so that only posts by the given user
-        return None
+        query = Post.all().filter("author", user).order("-created")
+        return query.fetch(limit = limit, offset = offset)
 
     def get_user_by_name(self, username):
         """ Get a user object from the db, based on their username """
@@ -124,13 +125,13 @@ class NewPostHandler(BlogHandler):
         self.response.out.write(response)
 
     def get(self):
+        user = self.user
         self.render_form()
 
     def post(self):
         """ Create a new blog post if possible. Otherwise, return with an error message """
         title = self.request.get("title")
         body = self.request.get("body")
-
         if title and body:
 
             # create a new Post object and store it in the database
